@@ -3,10 +3,6 @@
     hosts: storage
 
     tasks:
-    - name: Get master node IP      
-      script: master_host.py
-      args:
-        executable: python3
 
     - name: Configure Storage node
       shell: /opt/beegfs/sbin/beegfs-setup-storage -p /data/beegfs_store -f -r -m "{{ item }}"

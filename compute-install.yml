@@ -2,11 +2,6 @@
   - name: "Configure Compute Nodes"
     hosts: compute
     tasks:
-
-    - name: Get master node IP      
-      script: master_host.py
-      args:
-        executable: python3
    
     - name: Configure Client node
       shell: /opt/beegfs/sbin/beegfs-setup-client -f -m "{{ item }}"
