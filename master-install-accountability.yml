@@ -1,0 +1,79 @@
+---
+  - name: "Installing Control Node Libraries"
+    hosts: localhost
+    become: yes
+    
+    vars:
+      ansible_become_pass: node2020
+    
+    connection: local
+    tasks:
+
+    - name: Install bottle python package
+      pip:
+        name: PyMySQL
+
+    - name: Stopping mysql
+      shell: service mysql stop
+
+    - name: copying mysql-init to 
+      copy:
+        src: mysql-init
+        dest: /usr/local/src/cluster
+
+    - name: setting root password
+      shell: "mysqld --init-file=/home/me/mysql-init &"
+
+    - name: Starting mysql
+      shell: service mysql start
+
+    - name: Copying .my.cnf to /root/
+      copy:
+        src: .my.cnf
+        dest: /root/
+
+    - name: Create the slurm accountability database
+      community.mysql.mysql_db:
+        login_user: root
+        login_password: pass
+        check_implicit_admin: yes
+        login_unix_socket: /var/run/mysqld/mysqld.sock
+        name: slurm_acct_db
+        state: present
+
+    - name: Set privileges for user slurm in slurm_acct_db
+      community.mysql.mysql_user:
+        login_user: root
+        login_password: pass
+        check_implicit_admin: yes
+        login_unix_socket: /var/run/mysqld/mysqld.sock
+        state: present
+        name: slurm
+        password: some_pass
+        priv:
+          'slurm_acct_db.*': 'ALL,GRANT'
+
+    - name: Stopping  mysql
+      shell: service mysql stop
+
+    - name: Starting  mysql
+      shell: service mysql start
+    
+    - name: copying slurmdbd.conf to /etc/slurm
+      copy:
+        src: slurmdbd.conf
+        dest: /etc/slurm
+
+    - name: Copying service 
+      copy:
+        src: /usr/local/src/cluster/slurm-20.02.6/etc/slurmdbd.service
+        dest: /etc/systemd/system
+
+    - name: Enabling slurmctld
+      shell: systemctl enable slurmctld
+
+    - name: Enabling slurmdbd
+      shell: service slurmdbd start
+
+    - name: Enabling slurmctld
+      shell: service slurmctld start

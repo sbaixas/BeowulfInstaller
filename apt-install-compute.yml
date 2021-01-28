@@ -1,0 +1,13 @@
+---
+  - name: "Installing Compute Nodes apt packages"
+    hosts: compute
+    tasks:
+
+    - name: Downloading and installing packages
+      apt:
+        name: ['munge', 'libmunge-dev', 'gcc', 'gpp', 'g++', 'gfortran', 'make', 'libevent-dev', 'libhwloc-dev', python3-pip, ntp]
+        state: present
+
+
+
+    

@@ -1,0 +1,18 @@
+---
+
+
+
+  - name: "Generating slurm.conf"
+    hosts: localhost
+    become: yes
+    
+    vars:
+      ansible_become_pass: node2020
+    tasks:
+
+
+    - name: adding libraries to path
+      shell: echo "{{ item }}" >> /etc/profile
+      with_items:
+        - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/openmpi/lib/
+        - export PATH=$PATH:/opt/slurm/bin:/opt/openmpi/bin

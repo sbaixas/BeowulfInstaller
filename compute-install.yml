@@ -1,0 +1,153 @@
+---
+  - name: "Installing Compute Nodes Libraries"
+    hosts: compute
+    tasks:
+
+    - name: Creates a directory for source codes
+      file:
+        path: /usr/local/src/cluster
+        state: directory
+
+    - name: Creates a directory for pmix installation
+      file:
+        path: /opt/pmix
+        state: directory
+
+    - name: Extract pmix
+      unarchive:
+        src: source/pmix-3.1.4.tar.gz
+        dest: /usr/local/src/cluster
+
+    - name: Compiling pmix
+      shell: "{{ item }}"
+      args:
+        chdir: "/usr/local/src/cluster/pmix-3.1.4"
+      with_items:
+        - ./configure --prefix=/opt/pmix
+        - make install
+
+    - name: Add the slurm user  
+      user:
+        name: slurm
+
+    - name: Creates directories for slurm installation
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - /opt/slurm
+        - /etc/slurm
+
+    - name: Extract slurm
+      unarchive:
+        src: source/slurm-20.02.6.tar.bz2
+        dest: /usr/local/src/cluster
+
+    - name: Compiling slurm
+      shell: "{{ item }}"
+      args:
+        chdir: "/usr/local/src/cluster/slurm-20.02.6"
+      with_items:
+        - ./configure --prefix=/opt/slurm --sysconfdir=/etc/slurm --with-pmix=/opt/pmix
+        - make install
+        - ldconfig -n /opt/slurm/lib
+
+    - name: Copying service 
+      copy:
+        src: /usr/local/src/cluster/slurm-20.02.6/etc/slurmd.service
+        dest: /etc/systemd/system
+
+    - name: copying slurm.conf to /etc/slurm
+      copy:
+        src: slurm.conf
+        dest: /etc/slurm
+
+    - name: copying cgroup.conf to /etc/slurm
+      copy:
+        src: cgroup.conf
+        dest: /etc/slurm
+
+    - name: Changing /var/spool/ ownership
+      file:
+        path: /var/spool/
+        owner: slurm
+        group: slurm
+
+    - name: Changing /etc/slurm/slurm.conf ownership
+      file:
+        path: /etc/slurm/slurm.conf
+        owner: slurm
+        group: slurm
+
+    - name: Changing /etc/slurm/cgroup.conf ownership
+      file:
+        path: /etc/slurm/cgroup.conf
+        owner: slurm
+        group: slurm
+
+    - name: Extract openmpi
+      unarchive:
+        src: source/openmpi-4.0.5.tar.gz
+        dest: /usr/local/src/cluster
+
+    - name: Creates a directory for openmpi installation
+      file:
+        path: /opt/openmpi
+        state: directory
+
+    - name: Compiling openmpi
+      shell: "{{ item }}"
+      args:
+        chdir: "/usr/local/src/cluster/openmpi-4.0.5"
+      with_items:
+        - ./configure  --prefix=/opt/openmpi --with-slurm --with-pmix=/opt/pmix
+        - make all
+        - make install
+
+    - name: copying munge.key to /etc/munge/
+      copy:
+        src: /usr/local/src/cluster/munge.key
+        dest: /etc/munge/
+
+    - name: copying munge.key to /etc/munge/
+      copy:
+        src: /usr/local/src/cluster/munge.key
+        dest: /etc/munge/
+
+    - name: Starting munge
+      shell: service munge start
+
+    - name: Enabling munge
+      shell: systemctl enable munge
+
+
+    - name: Starting slurmd
+      shell: service slurmd start
+
+    - name: Enabling slurmd
+      shell: systemctl enable slurmd
+
+        
+    - name: adding libraries to path
+      shell: echo "{{ item }}" >> /etc/profile
+      with_items:
+        - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/openmpi/lib/
+        - export PATH=$PATH:/opt/slurm/bin:/opt/openmpi/bin
+
+    - name: copying ntp.conf to /etc/
+      copy:
+        src: ntp.conf
+        dest: /etc/
+
+    - name: Starting ntp
+      shell: service ntp start
+
+    - name: Enabling ntp
+      shell: systemctl enable ntp
+
+
+
+
+#lscpu | grep -v "NUMA" | grep 'CPU(s):\|Thread(s) per core:\|Core(s) per socket:\|Socket(s):' > test.txt
+#free | grep 'Mem:' >> test.txt
+    

@@ -1,0 +1,21 @@
+
+#Inventory file
+#All groups must stay in the order they are.
+#guineapig and master names must exist for the cluster installation.
+#The compute nodes are the ones used by Slurm to do tasks.
+#The storage nodes are the ones used by BeeGFS for storage.
+#The master node works as management for both Slurm and BeeGFS, and also as metadata for BeeGFS.
+#guineapig must be a compute node and is used to get the system specs for all compute nodes (as they should all be the same).
+
+[compute]
+guineapig ansible_host=root@10.1.73.123
+node153 ansible_host=root@10.1.73.153
+node141 ansible_host=root@10.1.73.141
+node142 ansible_host=root@10.1.73.142
+
+[storage]
+node143 ansible_host=root@10.1.73.143
+node144 ansible_host=root@10.1.73.144
+
+[control]
+master ansible_host=root@10.1.73.147

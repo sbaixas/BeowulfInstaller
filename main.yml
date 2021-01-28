@@ -1,0 +1,10 @@
+- name: install master node apt packages
+  import_playbook: apt-install-master.yml
+- name: setup master node
+  import_playbook: master-install.yml
+- name: install compute node apt packages
+  import_playbook: apt-install-compute.yml
+- name: setup compute nodes
+  import_playbook: compute-install.yml
+- name: setup accountability in master node
+  import_playbook: master-install-accountability.yml

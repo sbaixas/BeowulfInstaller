@@ -1,0 +1,20 @@
+---
+  - name: "Restarting master slurm services"
+    hosts: localhost
+    become: yes
+    
+    vars:
+      ansible_become_pass: node2020
+    tasks:
+    - name: Restarting slurmdbd
+      shell: service slurmdbd restart
+
+    - name: Restarting slurmctld
+      shell: service slurmctld restart
+
+  - name: "Restarting compute slurm service"
+    hosts: compute
+    tasks:
+    - name: starting slurmd
+      shell: service slurmd restart
+
