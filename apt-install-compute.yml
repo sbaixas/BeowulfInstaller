@@ -1,11 +1,29 @@
 ---
   - name: "Installing Compute Nodes apt packages"
     hosts: compute
+
     tasks:
+
+    - name: Download Beegfs packages
+      get_url:
+        url: https://www.beegfs.io/release/beegfs_7.2/dists/beegfs-deb10.list
+        dest: /etc/apt/sources.list.d
+
+    - name: Get Beegfs apt key
+      ansible.builtin.apt_key:
+        url: https://www.beegfs.io/release/beegfs_7.2/gpg/DEB-GPG-KEY-beegfs
+        state: present
 
     - name: Downloading and installing packages
       apt:
         name: ['munge', 'libmunge-dev', 'gcc', 'gpp', 'g++', 'gfortran', 'make', 'libevent-dev', 'libhwloc-dev', python3-pip, ntp]
+        state: present
+
+
+    - name: install Beegfs Client packages
+      apt:
+        update_cache: yes
+        name: ['beegfs-client', 'beegfs-helperd', 'beegfs-utils']
         state: present
 
 

@@ -1,0 +1,21 @@
+---
+  - name: "Install Beegfs Storage Nodes"
+    hosts: storage
+
+    tasks:
+
+    - name: Download Beegfs packages
+      get_url:
+        url: https://www.beegfs.io/release/beegfs_7.2/dists/beegfs-deb10.list
+        dest: /etc/apt/sources.list.d
+
+    - name: Get Beegfs apt key
+      ansible.builtin.apt_key:
+        url: https://www.beegfs.io/release/beegfs_7.2/gpg/DEB-GPG-KEY-beegfs
+        state: present
+
+    - name: Install Beegfs Storage packages
+      apt:
+        update_cache: yes
+        name: ['beegfs-storage']
+        state: present

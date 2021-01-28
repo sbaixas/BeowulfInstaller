@@ -1,5 +1,5 @@
 ---
-  - name: "Installing Compute Nodes Libraries"
+  - name: "Configure Compute Nodes"
     hosts: compute
     tasks:
 
