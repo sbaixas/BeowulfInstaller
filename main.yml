@@ -1,15 +1,9 @@
-- name: Install master node apt packages
-  import_playbook: apt-install-master.yml
 - name: Setup master node
   import_playbook: master-install.yml
 
-- name: Install storage node apt packages
-  import_playbook: apt-install-storage.yml
 - name: Setup storage nodes
   import_playbook: store-install.yml
 
-- name: Install compute node apt packages
-  import_playbook: apt-install-compute.yml
 - name: Setup compute nodes
   import_playbook: compute-install.yml
 

@@ -1,0 +1,8 @@
+- name: Install master node apt packages
+  import_playbook: apt-install-master.yml
+
+- name: Install storage node apt packages
+  import_playbook: apt-install-storage.yml
+
+- name: Install compute node apt packages
+  import_playbook: apt-install-compute.yml
