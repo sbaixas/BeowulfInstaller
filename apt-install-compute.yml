@@ -14,6 +14,10 @@
         url: https://www.beegfs.io/release/beegfs_7.2/gpg/DEB-GPG-KEY-beegfs
         state: present
 
+    - name: update apt list
+      apt:
+        update_cache: yes
+
     - name: Downloading and installing packages
       apt:
         name: ['munge', 'libmunge-dev', 'gcc', 'gpp', 'g++', 'gfortran', 'make', 'libevent-dev', 'libhwloc-dev', python3-pip, ntp]
@@ -22,7 +26,6 @@
 
     - name: Install Beegfs Client packages
       apt:
-        update_cache: yes
         name: ['beegfs-client', 'beegfs-helperd', 'beegfs-utils']
         state: present
 

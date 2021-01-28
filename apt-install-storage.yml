@@ -13,9 +13,12 @@
       ansible.builtin.apt_key:
         url: https://www.beegfs.io/release/beegfs_7.2/gpg/DEB-GPG-KEY-beegfs
         state: present
+        
+    - name: update apt list
+      apt:
+        update_cache: yes
 
     - name: Install Beegfs Storage packages
       apt:
-        update_cache: yes
         name: ['beegfs-storage']
         state: present
