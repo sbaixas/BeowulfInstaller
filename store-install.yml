@@ -2,6 +2,7 @@
   - name: "Configure Beegfs Storage Nodes"
     hosts: storage
 
+    tasks:
     - name: Get master node IP      
       script: master_host.py
       args:
