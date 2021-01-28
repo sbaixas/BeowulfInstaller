@@ -1,20 +1,46 @@
 ---
-  - name: "Installing Control Node Libraries"
+  - name: "Configure Control Node Libraries"
     hosts: localhost
     become: yes
-    
-    vars:
-      ansible_become_pass: node2020
     
     connection: local
     tasks:
 
-    - name: Creates a directory for source codes
+    - name: Configure Beegfs Management node
+      shell: "/opt/beegfs/sbin/beegfs-setup-mgmtd -p /data/beegfs_mgmtd -f"
+
+    - name: Get master node IP      
+      script: master_host.py
+      args:
+        executable: python3
+
+    - name: Configure Beegfs Metadata node
+      shell: /opt/beegfs/sbin/beegfs-setup-meta -p /data/beegfs_meta -f -m "{{ item }}"
+      with_items: "{{ lookup('file', 'master_ip.txt').splitlines() }}"
+
+    - name: Configure Beegfs Client node
+      shell: /opt/beegfs/sbin/beegfs-setup-client -f -m "{{ item }}"
+      with_items: "{{ lookup('file', 'master_ip.txt').splitlines() }}"
+
+    - name: Change Beegfs Client behaviour 
+      copy:
+        src: beegfs-client.service
+        dest: /lib/systemd/system
+
+    - name: Change Beegfs mount directory
+      copy: 
+        src: beegfs-mounts.conf
+        dest: /etc/beegfs
+
+    - name: service reload
+      shell: systemctl daemon-reload
+
+    - name: Create directory for source codes
       file:
         path: /usr/local/src/cluster
         state: directory
 
-    - name: Creates a directory for pmix installation
+    - name: Create directory for pmix installation
       file:
         path: /opt/pmix
         state: directory
@@ -24,7 +50,7 @@
         src: source/pmix-3.1.4.tar.gz
         dest: /usr/local/src/cluster
 
-    - name: Compiling pmix
+    - name: Compile pmix
       shell: "{{ item }}"
       args:
         chdir: "/usr/local/src/cluster/pmix-3.1.4"
@@ -36,7 +62,7 @@
       user:
         name: slurm
 
-    - name: Creates directories for slurm installation
+    - name: Create directories for slurm installation
       file:
         path: "{{ item }}"
         state: directory
@@ -49,7 +75,7 @@
         src: source/slurm-20.02.6.tar.bz2
         dest: /usr/local/src/cluster
 
-    - name: Compiling slurm
+    - name: Compile slurm
       shell: "{{ item }}"
       args:
         chdir: "/usr/local/src/cluster/slurm-20.02.6"
@@ -58,63 +84,63 @@
         - make install
         - ldconfig -n /opt/slurm/lib
 
-    - name: Copying service 
+    - name: Copy slurm service 
       copy:
         src: /usr/local/src/cluster/slurm-20.02.6/etc/slurmctld.service
         dest: /etc/systemd/system
   
-  - name: "Retrieving data for slurm.conf"
+  - name: "Retrieve data for slurm.conf"
     hosts: guineapig
     tasks:
 
-    - name: Getting processor specs
+    - name: Gettting processor specs
       shell: lscpu | grep -v "NUMA" | grep 'CPU(s):\|Thread(s) per core:\|Core(s) per socket:\|Socket(s):' > specs_raw.txt
 
-    - name: getting memory specs
+    - name: Gettting memory specs
       shell: free -m | grep 'Mem:' >> specs_raw.txt
 
-    - name: Store specs in ansible folder
+    - name: Storing specs in ansible folder
       fetch:
         src: specs_raw.txt
         dest: raw
 
-  - name: "Generating slurm.conf"
+  - name: "Generate slurm.conf"
     hosts: localhost
     tasks:
 
-    - name: writing slurm.conf
+    - name: Write slurm.conf
       script: slurm_conf_builder.py
       args:
         executable: python3
 
-  - name: "Continuing the installation"
+  - name: "Continue the installation"
     hosts: localhost
     become: yes
     tasks:
 
-    - name: copying slurm.conf to /etc/slurm
+    - name: Copy slurm.conf to /etc/slurm
       copy:
         src: slurm.conf
         dest: /etc/slurm
 
-    - name: copying cgroup.conf to /etc/slurm
+    - name: Copy cgroup.conf to /etc/slurm
       copy:
         src: cgroup.conf
         dest: /etc/slurm
 
-    - name: Changing /var/spool/ ownership
+    - name: Change /var/spool/ ownership
       file:
         path: /var/spool/
         owner: slurm
         group: slurm
 
-    - name: Changing /etc/slurm/slurm.conf ownership
+    - name: Change /etc/slurm/slurm.conf ownership
       file:
         path: /etc/slurm/slurm.conf
         owner: slurm
         group: slurm
 
-    - name: Changing /etc/slurm/cgroup.conf ownership
+    - name: Change /etc/slurm/cgroup.conf ownership
       file:
         path: /etc/slurm/cgroup.conf
         owner: slurm
@@ -125,7 +151,7 @@
         src: source/openmpi-4.0.5.tar.gz
         dest: /usr/local/src/cluster
 
-    - name: Creates a directory for openmpi installation
+    - name: Create directory for openmpi installation
       file:
         path: /opt/openmpi
         state: directory
@@ -139,22 +165,25 @@
         - make all
         - make install
 
-    - name: copying munge.key to 
+    - name: Copy munge.key to 
       shell: "cp /etc/munge/munge.key /usr/local/src/cluster"
 
-    - name: changing munge.key permissions
+    - name: Change munge.key permissions
       file:
         path: /usr/local/src/cluster/munge.key
         mode: 0777
 
-    - name: Starting munge
+    - name: Start munge
       shell: service munge start
 
-    - name: Enabling munge
+    - name: Enable munge
       shell: systemctl enable munge
 
+    - name: Start Beegfs Services
+      shell: systemctl start beegfs-mgmtd beegfs-meta beegfs-helperd beegfs-client
 
-    - name: adding libraries to path
+
+    - name: Add libraries to path
       shell: echo "{{ item }}" >> /etc/profile
       with_items:
         - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/openmpi/lib/

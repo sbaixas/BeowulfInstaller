@@ -3,9 +3,6 @@
     hosts: localhost
     become: yes
     
-    vars:
-      ansible_become_pass: node2020
-    
     connection: local
     tasks:
 

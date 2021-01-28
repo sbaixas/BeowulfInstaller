@@ -5,9 +5,6 @@
   - name: "Generating slurm.conf"
     hosts: localhost
     become: yes
-    
-    vars:
-      ansible_become_pass: node2020
     tasks:
 
 

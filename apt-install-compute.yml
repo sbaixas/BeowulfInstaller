@@ -20,7 +20,7 @@
         state: present
 
 
-    - name: install Beegfs Client packages
+    - name: Install Beegfs Client packages
       apt:
         update_cache: yes
         name: ['beegfs-client', 'beegfs-helperd', 'beegfs-utils']
