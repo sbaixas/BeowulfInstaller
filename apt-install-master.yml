@@ -26,7 +26,7 @@
         
     - name: Installing Beegfs packages
       apt:
-        name: ['beegfs-mgmtd', 'beegfs-meta', beegfs-client', 'beegfs-helperd', 'beegfs-utils']  
+        name: ['beegfs-mgmtd', 'beegfs-meta', 'beegfs-client', 'beegfs-helperd', 'beegfs-utils']  
         state: present
 
 
