@@ -1,32 +1,3 @@
-<!--
-*** Thanks for checking out the Best-README-Template. If you have a suggestion
-*** that would make this better, please fork the repo and create a pull request
-*** or simply open an issue with the tag "enhancement".
-*** Thanks again! Now go create something AMAZING! :D
-***
-***
-***
-*** To avoid retyping too much info. Do a search and replace for the following:
-*** github_username, repo_name, twitter_handle, email, project_title, project_description
--->
-
-
-
-<!-- PROJECT SHIELDS -->
-<!--
-*** I'm using markdown "reference style" links for readability.
-*** Reference links are enclosed in brackets [ ] instead of parentheses ( ).
-*** See the bottom of this document for the declaration of the reference variables
-*** for contributors-url, forks-url, etc. This is an optional, concise syntax you may use.
-*** https://www.markdownguide.org/basic-syntax/#reference-style-links
--->
-[![Contributors][contributors-shield]][contributors-url]
-[![Forks][forks-shield]][forks-url]
-[![Stargazers][stars-shield]][stars-url]
-[![Issues][issues-shield]][issues-url]
-[![MIT License][license-shield]][license-url]
-[![LinkedIn][linkedin-shield]][linkedin-url]
-
 
 
 <!-- PROJECT LOGO -->
@@ -36,15 +7,6 @@
 
   <p align="center">
     This project consists in a automatized Beowulf cluster installer with minimal setup.
-    <br />
-    <a href="https://github.com/github_username/repo_name"><strong>Explore the docs »</strong></a>
-    <br />
-    <br />
-    <a href="https://github.com/github_username/repo_name">View Demo</a>
-    ·
-    <a href="https://github.com/github_username/repo_name/issues">Report Bug</a>
-    ·
-    <a href="https://github.com/github_username/repo_name/issues">Request Feature</a>
   </p>
 </p>
 
@@ -111,7 +73,7 @@ One of the computers will act as a control node, the rest will be divided into m
   ```sh
   sudo apt install ssh
   ```
-- edit /etc/ssh/sshd_config file and set PermitRootLogin yes
+- Edit /etc/ssh/sshd_config file and set PermitRootLogin yes
 - Run
   ```sh
   sudo service sshd restart
@@ -129,7 +91,7 @@ One of the computers will act as a control node, the rest will be divided into m
   ```
   where ip_address is the static ip previously set for each node.
 
-- edit the file /etc/ansible hosts according to the hosts example file, groups guineapig and master names must stay the same.
+- Edit the file /etc/ansible hosts according to the hosts example file, groups guineapig and master names must stay the same.
 - Run
   ```sh
   ansible-galaxy collection install community.mysql
