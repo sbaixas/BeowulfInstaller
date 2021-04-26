@@ -38,7 +38,7 @@
 ## About The Project
 
 
-This installer was started as a titulation project at Universidad de los Andes.
+This installer was started as a titulation project at Universidad de los Andes, Chile.
 
 
 ### Built With
