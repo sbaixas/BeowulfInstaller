@@ -69,7 +69,7 @@ One of the computers will act as a control node, the rest will be divided into m
 - Set a root user password and run the following commands:
   ```sh
   sudo apt update
-  
+  ```
   ```sh
   sudo apt install ssh
   ```
@@ -95,6 +95,9 @@ One of the computers will act as a control node, the rest will be divided into m
 - Run
   ```sh
   ansible-galaxy collection install community.mysql
+  ```
+  ```sh
+  ansible-galaxy collection install ansible.posix
   ```
   ```sh
   ansible-playbook main.yml
